@@ -28,11 +28,27 @@ for dataset = 1:length(params.datasets)
     draw_graphs_from_adjmat( G.am ) ;
     
     % Construct hierarchy
-    cluster = girvan_newman(G.am,floor(15/2)) ;
+    cluster = girvan_newman(G.am,floor(size(G.am,1)/2)) ;
     draw_graphs_clustering_from_adjmat(G.am, cluster);
     
-    cluster = grPartition(G.am,floor(15/2)) ;
+    % We create an edge if we have any connection
+    G1 = pyramid_construction(G, cluster, 0);
+    draw_graphs_from_adjmat(G1.am);
+    
+    % connection ration 0.5
+    G2 = pyramid_construction(G, cluster, 0.2);
+    draw_graphs_from_adjmat(G2.am);
+    
+    cluster = grPartition(G.am,floor(size(G.am,1)/2)) ;
     draw_graphs_clustering_from_adjmat(G.am, cluster);
+    
+    % We create an edge if we have any connection
+    G1 = pyramid_construction(G, cluster, 0);
+    draw_graphs_from_adjmat(G1.am);
+    
+    % connection ration 0.5
+    G2 = pyramid_construction(G, cluster, 0.2);
+    draw_graphs_from_adjmat(G2.am);
     
     fprintf('Press any button...')
     pause;
