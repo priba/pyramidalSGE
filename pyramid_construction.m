@@ -12,7 +12,7 @@ function [G1] = pyramid_construction(G , cluster, delta)
         for j = i+1:length(classes)
             idx_j = classes(j) == cluster ;
             connections = G.am(idx_i, idx_j) ;
-            ratio_connection = sum(connections(:)) / numel(connections) 
+            ratio_connection = sum(connections(:)) / numel(connections) ;
             if ratio_connection > delta
                 G1.am(i,j) = 1 ; G1.am(j,i) = 1 ;
             end ;
