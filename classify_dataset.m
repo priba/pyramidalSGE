@@ -15,7 +15,19 @@ function [  ] = classify_dataset( dataset_name, varargin )
     % Number of graphs depending on the number of edges
     params.T = [1 1 3 5 12 30 79 227 710 2322 8071]; 
     
-    params.MAX2 = uint32(7);
+    % Output folder
+    params.out = [ pwd filesep 'out' filesep ];
+    if ~exist( params.out , 'dir' )
+        mkdir( params.out ) ;
+    end ;
+    
+    % Output file
+    params.headerSpec = 'Dataset: %s (%d graphs; %d classes; %d iterations)\n';
+    params.sgeSpec = '\t*Stochastic Graphlet Embedding:\n\t\tEpsilon: %f\n\t\tDelta: %f\n';
+    params.pyrSpec = '\t*Pyramidal:\n\t\tLevels: %d\n\t\tReduction: %f\n\t\tEdge Threshold: %f\n\t\tClustering function: %s\n';
+    params.sepSpec = '----------------------------------------------------\n';
+    % Graph sizes (in terms of edges)
+    params.MAX2 = uint32(8);
 
     %% Addpaths
     folders_paths = cellfun(@(x) strcat(pwd, filesep,x),params.folders, 'UniformOutput', false ) ;
@@ -41,7 +53,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
         fprintf('Loading Dataset = %s\n', dataset_name) ;
     end
     [ graphs , clss ] =  load_database( params.p_data , dataset_name ) ;
-    
+        
     %% Database information
     ngraphs = size(graphs,2);
     classes = unique(clss);
@@ -174,9 +186,21 @@ function [  ] = classify_dataset( dataset_name, varargin )
     % Mean and standard deviation
     maccs = mean(accs);
     mstds = std(accs)./sqrt(nits);
+    
+    % Save results
+    fileID = fopen([params.out dataset_name , '.txt'],'a') ;
+    fprintf(fileID,params.headerSpec, dataset_name, ngraphs, nclasses, nits) ;
+    fprintf(fileID,params.sgeSpec, epsi , del) ;
+    fprintf(fileID,params.pyrSpec, pyr_levels , pyr_reduction , edge_thresh , func2str(clustering_func)) ;
     for i = 1:params.MAX2-2
-        fprintf('%.2f\\pm %.2f \n',maccs(i),mstds(i));
+        fprintf(fileID, 't = %d \t %.2f \\pm %.2f \n',i+2, maccs(i),mstds(i));
+        if VERBOSE
+            fprintf('t = %d \t %.2f\\pm %.2f \n', i+2 , maccs(i),mstds(i));
+        end
     end;
+    fprintf(fileID,params.sepSpec) ;
+    fclose(fileID);
+    
     
     %% Rmpaths
     folders_paths = cellfun(@(x) strcat(pwd, filesep,x),params.folders, 'UniformOutput', false ) ;
