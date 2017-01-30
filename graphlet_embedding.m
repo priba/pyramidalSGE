@@ -1,6 +1,7 @@
 function global_var = graphlet_embedding( graph , graph_id , M , global_var, params ) 
 
-    [I,J] = find(graph.am);
+    % [I,J] = find(graph.am);
+    [I,J] = find(triu(graph.am |graph.am')); % Undirected graph
     nV = size(graph.am,1);
 
     L = uint32([I,J]);
@@ -30,15 +31,18 @@ function global_var = graphlet_embedding( graph , graph_id , M , global_var, par
 %         clear weights_node_isz;
 %     end;
 
-    graphlets(sizes_graphlets <= 2) = [];
-    sizes_graphlets(sizes_graphlets <= 2) = [];
+    idx = sizes_graphlets <= 2 ; 
+    graphlets(idx) = [];
+    sizes_graphlets(idx) = [];
+    list_vertices_graphlets(idx) = [];
+    indices_vertices_graphlets(idx) = [];
 
     idxle4 = sizes_graphlets<=4;
 
     graphletsle4 = graphlets(idxle4);
 
     graphletsle4_sorted = cellfun(@sort,graphletsle4,'UniformOutput',false); clear graphletsge4;
-    fcn1 = @(x) sort(diff([ 0 find(x(1:end-1) ~= x(2:end)) length(x) ])); %Sorted degree nodes as hash function
+    fcn1 = @(x) sort(diff([ 0 find(x(1:end-1) ~= x(2:end)) length(x) ])); % Sorted degree nodes as hash function
     sorted_degrees_nodes = cellfun(fcn1,graphletsle4_sorted,'UniformOutput',false);
 
     clear graphletsle4 graphletsle4_sorted;

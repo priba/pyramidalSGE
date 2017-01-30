@@ -76,15 +76,18 @@ function [  ] = classify_dataset( dataset_name, varargin )
             pyr_graph{j} = pyramid_construction(pyr_graph{j-1}, cluster, edge_thresh);
         end;
         
-        % Embedd
-        [ global_var ] = graphlet_embedding(pyr_graph{1} , i , M , global_var, params ) ; 
+        % Embedding
+        for j = 1:pyr_levels
+            [ global_var ] = graphlet_embedding(pyr_graph{j} , i , M , global_var, params ) ;
+        end ;
+        
         
         if VERBOSE
             toc
         end ;
     end;
     
-    dim_hists = cellfun(@length,global_var.hash_codes_uniq);
+    dim_hists = cellfun(@(x) size(x,1) ,global_var.hash_codes_uniq);
     clear global_var.hash_codes_uniq;
     
     %% Compute histograms and kernels
@@ -110,7 +113,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
     
     %% Evaluate
     % Evaluate nits times to get the accuracy mean and standard deviation
-    accs = zeros(nits,params.MAX2-1);
+    accs = zeros(nits,params.MAX2-2);
     for it = 1:nits
         train_set = [];
 
@@ -170,9 +173,9 @@ function [  ] = classify_dataset( dataset_name, varargin )
     
     % Mean and standard deviation
     maccs = mean(accs);
-    mstds = std(accs);
-    for i = 1:params.MAX2-1
-        fprintf('%.2f\\pm %.2f ',maccs(i),mstds(i));
+    mstds = std(accs)./sqrt(nits);
+    for i = 1:params.MAX2-2
+        fprintf('%.2f\\pm %.2f \n',maccs(i),mstds(i));
     end;
     
     %% Rmpaths
@@ -230,7 +233,7 @@ function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
     VERBOSE = 0 ;
     eps = 0.1 ;
     del = 0.1 ;
-    pyr_levels = 2 ;
+    pyr_levels = 1 ;
     pyr_reduction = 2 ;
     edge_tresh = 0 ;
     clustering_func = @girvan_newman ;
