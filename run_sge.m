@@ -1,6 +1,6 @@
 addpath(genpath('./clustering'));
 
-VERBOSE = 1 ;
+VERBOSE = 0 ;
 eps_i = [ 0.1 , 0.05 ] ;
 del_i = [ 0.1 , 0.05 ] ;
 pyr_levels = [ 1 , 2 ] ;

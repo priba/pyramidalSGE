@@ -272,7 +272,7 @@ function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
             VERBOSE = input{v};
         case 'epsilon'
             v = v+1;
-            epsi = input{v};
+            eps = input{v};
         case 'delta'
             v = v+1;
             del = input{v};
