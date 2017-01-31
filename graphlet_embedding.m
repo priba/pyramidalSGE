@@ -2,7 +2,7 @@ function global_var = graphlet_embedding( graph , graph_id , M , global_var, par
 
     [I,J] = find(graph.am);
     % [I,J] = find(triu(graph.am |graph.am')); % Undirected graph
-    nV = size(graph.am,1);
+    % nV = size(graph.am,1);
 
     L = uint32([I,J]);
 

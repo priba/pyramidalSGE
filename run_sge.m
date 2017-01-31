@@ -1,3 +1,4 @@
+clc; clear all;
 addpath(genpath('./clustering'));
 
 VERBOSE = 0 ;

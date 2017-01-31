@@ -3,14 +3,35 @@ function [  ] = classify_dataset( dataset_name, varargin )
 %   Detailed explanation goes here
 
     %% Parameters
-    % Dataset path
-    params.p_data = [ pwd filesep 'dataset' filesep ] ;
+        
+    % Check hostname to know the file structure for adding the packages
+    [~, name] = system('hostname');
     
-    % External libreries (considering them to be on the userpath folder
-    params.libraries = { 'matlab_bgl', 'libsvm/matlab', 'vlfeat' } ;
-    
-    % Project folders
-    params.folders = { 'clustering', 'random_graphlet1' } ;
+    if ismember(lower(name), {'cvc206'} ) 
+        % Dataset path
+        params.p_data = '/home/adutta/Workspace/Datasets/STDGraphs' ;
+
+        % External libreries (considering them to be on the userpath folder
+        params.libraries = {
+            '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools/matlab_bgl',...
+            '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools/libsvm/matlab',...
+            '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools/vlfeat'
+            } ;
+
+             % Project folders
+        params.folders = { 'clustering',...
+            '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools/random_graphlet1'
+            } ;
+    else
+        % Dataset path
+        params.p_data = [ pwd filesep 'dataset' filesep ] ;
+
+        % External libreries (considering them to be on the userpath folder
+        params.libraries = { 'matlab_bgl', 'libsvm/matlab', 'vlfeat' } ;
+
+        % Project folders
+        params.folders = { 'clustering', 'random_graphlet1' } ;
+    end ;
     
     % Number of graphs depending on the number of edges
     params.T = [1 1 3 5 12 30 79 227 710 2322 8071]; 
