@@ -139,7 +139,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
     end ;
     
     % All possible combinations
-    combinations = 1:MAX2(1)-2;
+    combinations = (1:MAX2(1)-2)';
     for j = 2:pyr_levels
         combinations = allcomb(combinations, 1:MAX2(j)-2) ;
     end ;
