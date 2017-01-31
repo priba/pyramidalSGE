@@ -1,4 +1,4 @@
-function global_var = graphlet_embedding( graph , graph_id , M , global_var, params ) 
+function global_var = graphlet_embedding( graph , graph_id , M , global_var, MAX2 ) 
 
     [I,J] = find(graph.am);
     % [I,J] = find(triu(graph.am |graph.am')); % Undirected graph
@@ -9,11 +9,11 @@ function global_var = graphlet_embedding( graph , graph_id , M , global_var, par
     clear I J;
     
     % Find the random graphlets
-    graphlets = generate_random_graphlets(L,M(end),params.MAX2);                
+    graphlets = generate_random_graphlets(L,M(end),MAX2);                
     sizes_graphlets = cellfun(@length,graphlets)/2;
 
     idx = [];
-    for isz = 1:params.MAX2                    
+    for isz = 1:MAX2                    
         idx = [idx;find(sizes_graphlets==isz,M(isz))];
     end;
 
@@ -74,7 +74,7 @@ function global_var = graphlet_embedding( graph , graph_id , M , global_var, par
 
     clear idxle4 idxle5 sorted_degrees_nodes betweenness_centralities;
 
-    for j = 3:params.MAX2
+    for j = 3:MAX2
         idxj = (sizes_graphlets == j);
 
         if(~nnz(idxj))

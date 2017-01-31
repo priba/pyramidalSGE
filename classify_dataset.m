@@ -33,6 +33,8 @@ function [  ] = classify_dataset( dataset_name, varargin )
         params.folders = { 'clustering', 'random_graphlet1' } ;
     end ;
     
+    clear name;
+    
     % Number of graphs depending on the number of edges
     params.T = [1 1 3 5 12 30 79 227 710 2322 8071]; 
     
@@ -47,8 +49,6 @@ function [  ] = classify_dataset( dataset_name, varargin )
     params.sgeSpec = '\t*Stochastic Graphlet Embedding:\n\t\tEpsilon: %f\n\t\tDelta: %f\n';
     params.pyrSpec = '\t*Pyramidal:\n\t\tLevels: %d\n\t\tReduction: %f\n\t\tEdge Threshold: %f\n\t\tClustering function: %s\n';
     params.sepSpec = '----------------------------------------------------\n';
-    % Graph sizes (in terms of edges)
-    params.MAX2 = uint32(8);
 
     %% Addpaths
     folders_paths = cellfun(@(x) strcat(pwd, filesep,x),params.folders, 'UniformOutput', false ) ;
@@ -65,7 +65,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
     clear user_path folders_paths ;
     
     %% Default values
-    [epsi, del, pyr_levels, pyr_reduction, edge_thresh, clustering_func, nits, VERBOSE]...
+    [epsi, del, pyr_levels, pyr_reduction, edge_thresh, clustering_func, MAX2, nits, VERBOSE]...
         = input_parser( varargin ) ;
     rng(0);
         
@@ -74,7 +74,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
         fprintf('Loading Dataset = %s\n', dataset_name) ;
     end
     [ graphs , clss ] =  load_database( params.p_data , dataset_name ) ;
-        
+            
     %% Database information
     ngraphs = size(graphs,2);
     classes = unique(clss);
@@ -85,13 +85,14 @@ function [  ] = classify_dataset( dataset_name, varargin )
     end
     
     %% Create histogram indices
-
-    M = uint32(ceil(2*(params.T(1:params.MAX2)*log(2)+log(1/del))/epsi^2));
-    
+  
     % Initialize storage
-    global_var.hash_codes_uniq = cell(params.MAX2-2,1);
-    global_var.idx_image = cell(params.MAX2-2,1);
-    global_var.idx_bin = cell(params.MAX2-2,1);
+    for i = 1:pyr_levels
+        M{i} = uint32(ceil(2*(params.T(1:MAX2(i))*log(2)+log(1/del))/epsi^2));
+        global_var(i).hash_codes_uniq = cell(MAX2(i)-2,1);
+        global_var(i).idx_image = cell(MAX2(i)-2,1);
+        global_var(i).idx_bin = cell(MAX2(i)-2,1);
+    end
     
     %% Iterate whole dataset
     for i = 1:ngraphs
@@ -111,7 +112,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
         
         % Embedding
         for j = 1:pyr_levels
-            [ global_var ] = graphlet_embedding(pyr_graph{j} , i , M , global_var, params ) ;
+            [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) ) ;
         end ;
         
         
@@ -119,63 +120,82 @@ function [  ] = classify_dataset( dataset_name, varargin )
             toc
         end ;
     end;
-    
-    dim_hists = cellfun(@(x) size(x,1) ,global_var.hash_codes_uniq);
-    clear global_var.hash_codes_uniq;
+
+    % Histogram dimensions
+    dim_hists = cell(pyr_levels,1) ;
+    for i = 1:pyr_levels
+        dim_hists{i} = cellfun(@(x) size(x,1) ,global_var(i).hash_codes_uniq);
+        clear global_var(i).hash_codes_uniq;
+    end ;
     
     %% Compute histograms and kernels
-    histograms = cell(1,params.MAX2-2);
+    histograms = cell(pyr_levels,1);
 
-    KM_train = zeros(ngraphs,ngraphs,params.MAX2-2);
-    KM_test = zeros(ngraphs,ngraphs,params.MAX2-2);
-
-    for i = 1:params.MAX2-2
-
-        histograms{i} = sparse(global_var.idx_image{i},global_var.idx_bin{i},1,ngraphs,dim_hists(i));
-        histograms{i} = bsxfun(@times, histograms{i},1./(sum(histograms{i},2)+eps));
-
-        X_train = histograms{i};
-        X_test = histograms{i};
-
-        KM_train(:,:,i) = vl_alldist2(X_train',X_train','KL1');
-        KM_test(:,:,i) = vl_alldist2(X_test',X_train','KL1');
-
-    end;
+    for j = 1:pyr_levels
+        histograms{j} = cell(1,MAX2(j)-2);
+        for i = 1:MAX2(j)-2
+            histograms{j}{i} = sparse(global_var(j).idx_image{i},global_var(j).idx_bin{i},1,ngraphs,dim_hists{j}(i));
+        end ;
+    end ;
     
-    clear global_var;
+    % All possible combinations
+    combinations = 1:MAX2(1)-2;
+    for j = 2:pyr_levels
+        combinations = allcomb(combinations, 1:MAX2(j)-2) ;
+    end ;
     
-    %% Evaluate
-    % Evaluate nits times to get the accuracy mean and standard deviation
-    accs = zeros(nits,params.MAX2-2);
-    for it = 1:nits
-        train_set = [];
+    maccs = zeros(size(combinations,1));
+    mstds = zeros(size(combinations,1));
+    for c = 1:size(combinations,1)
+        
+        comb = combinations(c,:);
+        
+        KM_train = zeros(ngraphs,ngraphs);
+        KM_test = zeros(ngraphs,ngraphs);
 
-        for i = classes'
-            idx = find(clss == i);
-            lngth_idx = length(idx);
-            p90 = round(lngth_idx*0.9);
-            train_set = [train_set;randsample(idx,p90)];
+        % Concat histogram
+        comb_hist = [];
+        for i = 1:length(comb)
+            comb_hist = [comb_hist , histograms{i}{comb(i)} ];
+        end
+        
+        % Normalize hist
+        comb_hist = comb_hist./repmat( sum(comb_hist,2)+eps ,1, size(comb_hist,2));
+        
+        X_train = comb_hist;
+        X_test = comb_hist;
 
-        end;
+        KM_train(:,:) = vl_alldist2(X_train',X_train','KL1');
+        KM_test(:,:) = vl_alldist2(X_test',X_train','KL1');
 
-        train_set = sort(train_set);
-        test_set = setdiff(1:ngraphs,train_set')';
 
-        train_classes = clss(train_set);
-        test_classes = clss(test_set);
+        %% Evaluate
+        % Evaluate nits times to get the accuracy mean and standard deviation
+        accs = zeros(nits,1);
+        for it = 1:nits
+            train_set = [];
 
-        ntrain_set = size(train_set,1);
-        ntest_set = size(test_set,1);
+            for i = classes'
+                idx = find(clss == i);
+                lngth_idx = length(idx);
+                p90 = round(lngth_idx*0.9);
+                train_set = [train_set;randsample(idx,p90)];
 
-        % Training and testing individual kernels
+            end;
 
-        for i = 1:params.MAX2-2
+            train_set = sort(train_set);
+            test_set = setdiff(1:ngraphs,train_set')';
 
-            w = ones(1,i);
-            w = w/sum(w);
+            train_classes = clss(train_set);
+            test_classes = clss(test_set);
 
-            K_train = [(1:ntrain_set)' KM_train(train_set,train_set,i)];
-            K_test = [(1:ntest_set)' KM_test(test_set,train_set,i)];
+            ntrain_set = size(train_set,1);
+            ntest_set = size(test_set,1);
+
+            % Training and testing individual kernels
+
+            K_train = [(1:ntrain_set)' KM_train(train_set,train_set)];
+            K_test = [(1:ntest_set)' KM_test(test_set,train_set)];
 
             cs = 5:5:100;
             best_cv = 0;
@@ -199,25 +219,35 @@ function [  ] = classify_dataset( dataset_name, varargin )
             model_libsvm = svmtrain(train_classes,K_train,options);
 
             [~,acc,~] = svmpredict(test_classes,K_test,model_libsvm,'-b 1');
-            accs(it,i) = acc(1);
+            accs(it) = acc(1);
+        end ;
 
-        end;
-    end ;
-    
-    % Mean and standard deviation
-    maccs = mean(accs);
-    mstds = std(accs)./sqrt(nits);
+        % Mean and standard deviation
+        maccs(c) = mean(accs);
+        mstds(c) = std(accs)./sqrt(nits);
+    end
+    clear global_var;
     
     % Save results
     fileID = fopen([params.out dataset_name , '.txt'],'a') ;
     fprintf(fileID,params.headerSpec, dataset_name, ngraphs, nclasses, nits) ;
     fprintf(fileID,params.sgeSpec, epsi , del) ;
     fprintf(fileID,params.pyrSpec, pyr_levels , pyr_reduction , edge_thresh , func2str(clustering_func)) ;
-    for i = 1:params.MAX2-2
-        fprintf(fileID, 't = %d \t %.2f \\pm %.2f \n',i+2, maccs(i),mstds(i));
+    for i = 1:size(combinations,1)
+        fprintf(fileID, 't = ');
         if VERBOSE
-            fprintf('t = %d \t %.2f\\pm %.2f \n', i+2 , maccs(i),mstds(i));
-        end
+            fprintf('t = ');
+        end ;
+        for j = 1:size(combinations,2)
+            fprintf(fileID, '%d\t', combinations(i,j)+2) ;
+            if VERBOSE
+            	fprintf('%d\t', combinations(i,j)+2) ;
+            end ;
+        end ;
+        fprintf(fileID, '%.2f \\pm %.2f \n', maccs(i),mstds(i));
+        if VERBOSE
+            fprintf('%.2f \\pm %.2f \n', maccs(i),mstds(i));
+        end ;
     end;
     fprintf(fileID,params.sepSpec) ;
     fclose(fileID);
@@ -274,7 +304,7 @@ end
 
 %% Default values
 function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
-    nits, VERBOSE] = input_parser( input )
+    max2, nits, VERBOSE] = input_parser( input )
     VERBOSE = 0 ;
     eps = 0.1 ;
     del = 0.1 ;
@@ -287,8 +317,8 @@ function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
     % Parse optional input parameters
     v = 1;
     while v < numel(input)
-        switch input{v}
-        case 'VERBOSE'
+        switch lower(input{v})
+        case 'verbose'
             v = v+1;
             VERBOSE = input{v};
         case 'epsilon'
@@ -311,6 +341,9 @@ function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
         case 'clustering_func'
             v = v+1;
             clustering_func = input{v};
+        case 'max2'
+            v = v+1;
+            max2 = input{v};
         case 'nits'
             v = v+1;
             nits = input{v};
@@ -319,4 +352,8 @@ function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
         end
         v = v+1;
     end
+    if ~exist('max2', 'var')
+        max2 = 7*ones(pyr_levels,1); % Max size of graphlets in terms of edges
+    end
+    max2 = uint32(max2);
 end
