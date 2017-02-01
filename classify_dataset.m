@@ -7,21 +7,18 @@ function [  ] = classify_dataset( dataset_name, varargin )
     % Check hostname to know the file structure for adding the packages
     [~, name] = system('hostname');
     
-    if ismember(lower(name), {'cvc206'} ) 
+    if ismember(upper(cellstr(name)), {'CVC206'} ) 
         % Dataset path
         params.p_data = '/home/adutta/Workspace/Datasets/STDGraphs' ;
 
         % External libreries (considering them to be on the userpath folder
-        params.libraries = {
-            '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools/matlab_bgl',...
-            '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools/libsvm/matlab',...
-            '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools/vlfeat'
-            } ;
+        params.libraries = {'matlab_bgl', 'libsvm/matlab', 'vlfeat',...
+            'random_graphlet1'} ;
 
              % Project folders
-        params.folders = { 'clustering',...
-            '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools/random_graphlet1'
-            } ;
+        params.folders = { 'clustering' } ;
+        
+        userpath = '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools' ;
     else
         % Dataset path
         params.p_data = [ pwd filesep 'dataset' filesep ] ;
