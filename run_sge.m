@@ -1,8 +1,11 @@
-clc; clear all;
+clc; clear;
+
+rng(0); 
+
 addpath(genpath('./clustering'));
 
 % Dataset
-dataset_name = 'MUTAG';
+dataset_name = 'DD';
 
 % Information
 VERBOSE = 0 ;
