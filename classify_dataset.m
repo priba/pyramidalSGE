@@ -109,7 +109,9 @@ function [  ] = classify_dataset( dataset_name, varargin )
         
         % Embedding
         for j = 1:pyr_levels
-            [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) ) ;
+            if any(pyr_graph{j}.am(:))
+                [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) ) ;
+            end
         end ;
         
         
