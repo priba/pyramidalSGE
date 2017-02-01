@@ -18,7 +18,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
              % Project folders
         params.folders = { 'clustering' } ;
         
-        userpath = '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools' ;
+        user_path = '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools' ;
     else
         % Dataset path
         params.p_data = [ pwd filesep 'dataset' filesep ] ;
@@ -28,6 +28,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
 
         % Project folders
         params.folders = { 'clustering', 'random_graphlet1' } ;
+        user_path = userpath;
     end ;
     
     clear name;
@@ -52,7 +53,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
     folders_paths = cellfun(@genpath,folders_paths, 'UniformOutput', false ) ;
     addpath([folders_paths{:} ])
     
-    user_path = strrep(userpath,';',''); % Windows
+    user_path = strrep(user_path,';',''); % Windows
     user_path = strrep(user_path,':',''); % Linux
     
     folders_paths = cellfun(@(x) strcat(user_path, filesep,x),params.libraries, 'UniformOutput', false ) ;
@@ -109,7 +110,9 @@ function [  ] = classify_dataset( dataset_name, varargin )
         
         % Embedding
         for j = 1:pyr_levels
-            [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) ) ;
+            if any(pyr_graph{j}.am(:))
+                [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) ) ;
+            end
         end ;
         
         
