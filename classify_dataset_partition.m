@@ -95,7 +95,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     %% Iterate whole dataset
     for i = 1:ngraphs
         if VERBOSE
-            fprintf('Graph: %d.\n',i);
+            fprintf('Graph: %d. ',i);
             tic;
         end ;
         
