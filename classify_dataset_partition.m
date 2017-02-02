@@ -71,15 +71,20 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     if VERBOSE
         fprintf('Loading Dataset = %s\n', dataset_name) ;
     end
-    [ graphs , clss ] =  load_database( params.p_data , dataset_name ) ;
-
+    [ graphs_train, clss_train, graphs_test, clss_test] ...
+        =  load_database( params.p_data , dataset_name ) ;
+    
+    graphs = [graphs_train , graphs_test];
+    clss = [clss_train; clss_test];
     %% Database information
+    ntrain = size(graphs_train,2);
+    ntest = size(graphs_test,2);
     ngraphs = size(graphs,2);
     classes = unique(clss);
     nclasses = size(classes,1);
     if VERBOSE
-        fprintf('Dataset Information\n\tNumber of graph: %d\n\tNumber of classes: %d\n',...
-            ngraphs, nclasses) ;
+        fprintf('Dataset Information\n\tNumber of graph:%d\t(Train %d\tTest %d)\n\tNumber of classes: %d\n',...
+            ngraphs,ntrain,ntest, nclasses) ;
     end
     
     %% Create histogram indices
@@ -150,8 +155,8 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         
         comb = combinations(c,:);
         
-        KM_train = zeros(ngraphs,ngraphs);
-        KM_test = zeros(ngraphs,ngraphs);
+        KM_train = zeros(ntrain,ntrain);
+        KM_test = zeros(ntest,ntrain);
 
         % Concat histogram
         comb_hist = [];
@@ -162,8 +167,8 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         % Normalize hist
         comb_hist = comb_hist./repmat( sum(comb_hist,2)+eps ,1, size(comb_hist,2));
         
-        X_train = comb_hist;
-        X_test = comb_hist;
+        X_train = comb_hist(1:ntrain,:);
+        X_test = comb_hist(ntrain+(1:ntest),:);
 
         KM_train(:,:) = vl_alldist2(X_train',X_train','KL1');
         KM_test(:,:) = vl_alldist2(X_test',X_train','KL1');
@@ -173,29 +178,16 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         % Evaluate nits times to get the accuracy mean and standard deviation
         accs = zeros(nits,1);
         for it = 1:nits
-            train_set = [];
 
-            for i = classes'
-                idx = find(clss == i);
-                lngth_idx = length(idx);
-                p90 = round(lngth_idx*0.9);
-                train_set = [train_set;randsample(idx,p90)];
 
-            end;
+            train_classes = clss(1:ntrain);
+            test_classes = clss(ntrain+(1:ntest));
 
-            train_set = sort(train_set);
-            test_set = setdiff(1:ngraphs,train_set')';
-
-            train_classes = clss(train_set);
-            test_classes = clss(test_set);
-
-            ntrain_set = size(train_set,1);
-            ntest_set = size(test_set,1);
 
             % Training and testing individual kernels
 
-            K_train = [(1:ntrain_set)' KM_train(train_set,train_set)];
-            K_test = [(1:ntest_set)' KM_test(test_set,train_set)];
+            K_train = [(1:ntrain)' KM_train];
+            K_test = [(1:ntest)' KM_test];
 
             cs = 5:5:100;
             best_cv = 0;
@@ -270,12 +262,12 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
 end
 
 %% Loads the database in the correct format
-function [ graphs_train, clss_train, graphs_valid, clss_valid, graphs_test, clss_test] = ...
+function [ graphs_train, clss_train, graphs_test, clss_test] = ...
     load_database( p_data , dataset_name )
     switch dataset_name
         case 'GREC'
             [ graphs_train, clss_train, graphs_valid, clss_valid,...
-                graphs_test, clss_test] = load_grec([ p_data filesep 'data']);
+                graphs_test, clss_test] = load_grec([ p_data filesep dataset_name filesep 'data']);
         case 'GWHistoGraph'
             [ graphs_train, clss_train, graphs_valid, clss_valid,...
                 graphs_test, clss_test] = load_gw(p_data, subfolder);            
@@ -283,6 +275,8 @@ function [ graphs_train, clss_train, graphs_valid, clss_valid, graphs_test, clss
             error('pyramidalSGE:incorrectDataset',...
                 'Error. \nDatabase %s not accepted.', dataset_name)
     end;
+    graphs_train = [graphs_train , graphs_valid];
+    clss_train = [clss_train ; clss_valid];
 end
 
 
