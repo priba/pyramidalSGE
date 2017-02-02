@@ -1,3 +1,5 @@
+%% Run classification script
+
 clc; clear;
 
 rng(0); 
@@ -5,7 +7,7 @@ rng(0);
 addpath(genpath('./clustering'));
 
 % Dataset
-dataset_name = 'MUTAG';
+dataset_name = 'GREC';
 
 % Information
 VERBOSE = 1 ;
@@ -27,9 +29,15 @@ nits = 10 ;
 for eps = eps_i
     for del = del_i
         for pyr_level = pyr_levels
-            classify_dataset(dataset_name, 'VERBOSE', VERBOSE, 'epsilon', eps, 'delta', del, ...
-                'pyr_levels', pyr_level,'pyr_reduction', pyr_reduction, 'edge_tresh', edge_tresh, ...
-                'max2', max2(1:pyr_level), 'label', node_label, 'clustering_func' , clustering_func);
+            if ismember(lower(dataset_name), {'grec','gwhistograph'})
+                classify_dataset_partition(dataset_name, 'VERBOSE', VERBOSE, 'epsilon', eps, 'delta', del, ...
+                    'pyr_levels', pyr_level,'pyr_reduction', pyr_reduction, 'edge_tresh', edge_tresh, ...
+                    'max2', max2(1:pyr_level), 'label', node_label, 'clustering_func' , clustering_func);
+            else
+                classify_dataset_kfold(dataset_name, 'VERBOSE', VERBOSE, 'epsilon', eps, 'delta', del, ...
+                    'pyr_levels', pyr_level,'pyr_reduction', pyr_reduction, 'edge_tresh', edge_tresh, ...
+                    'max2', max2(1:pyr_level), 'label', node_label, 'clustering_func' , clustering_func);
+            end
         end ;
     end ;
 end ;

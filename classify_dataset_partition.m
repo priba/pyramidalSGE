@@ -1,4 +1,4 @@
-function [  ] = classify_dataset( dataset_name, varargin )
+function [  ] = classify_dataset_partition( dataset_name, varargin )
 %CLASSIFY_DATASET Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -270,32 +270,9 @@ function [  ] = classify_dataset( dataset_name, varargin )
 end
 
 %% Loads the database in the correct format
-function [ graphs , clss ] = load_database( p_data , dataset_name )
+function [ graphs_train, clss_train, graphs_valid, clss_valid, graphs_test, clss_test] = ...
+    load_database( p_data , dataset_name )
     switch dataset_name
-        case 'MUTAG'
-            load(fullfile(p_data,'MUTAG.mat'));
-            lmutag(lmutag == -1) = 2;clss = lmutag;
-            graphs = MUTAG;
-        case 'PTC'
-            load(fullfile(p_data,'PTC.mat'));
-            lptc(lptc == -1) = 2;clss = lptc;
-            graphs = PTC;
-        case 'ENZYMES'
-            load(fullfile(p_data,'ENZYMES.mat'));
-            clss = lenzymes;
-            graphs = ENZYMES;
-        case 'DD'
-            load(fullfile(p_data,'DD.mat'));
-            clss = ldd;
-            graphs = DD;
-        case 'NCI1'
-            load(fullfile(p_data,'NCI1.mat'));
-            clss = lnci1;
-            graphs = NCI1;
-        case 'NCI109'
-            load(fullfile(p_data,'NCI109.mat'));
-            clss = lnci109;
-            graphs = NCI109;
         case 'GREC'
             [ graphs_train, clss_train, graphs_valid, clss_valid,...
                 graphs_test, clss_test] = load_grec([ p_data filesep 'data']);
@@ -308,68 +285,9 @@ function [ graphs , clss ] = load_database( p_data , dataset_name )
     end;
 end
 
-%% Load GREC database
-function [ graphs_train, clss_train, graphs_valid, clss_valid,...
-    graphs_test, clss_test] = load_grec(folder)
 
-[fns_train,clss_train] = read_grec_cxl(fullfile(folder,'train.cxl')) ;
-[fns_valid,clss_valid] = read_grec_cxl(fullfile(folder,'valid.cxl')) ;
-[fns_test,clss_test] = read_grec_cxl(fullfile(folder,'test.cxl')) ;
 
-ntrain = length(fns_train) ; 
-nvalid = length(fns_valid) ; 
-ntest = length(fns_test) ; 
 
-for i = 1:ntrain
-    [graphs_train(i).v, graphs_train(i).nl, graphs_train(i).e,...
-        graphs_train(i).el] = read_grec_gxl(fullfile(folder, fns_train{i})) ;
-end;
-
-for i = 1:nvalid
-    [graphs_valid(i).v, graphs_valid(i).nl, graphs_valid(i).e,...
-        graphs_valid(i).el] = read_grec_gxl(fullfile(folder, fns_valid{i})) ;
-end;
-
-for i = 1:ntest
-    [graphs_test(i).v, graphs_test(i).nl, graphs_test(i).e,...
-        graphs_test(i).el] = read_grec_gxl(fullfile(folder, fns_test{i})) ;
-end;
-
-end
-
-%% Load GWHistoGraph database
-function [ graphs_train, clss_train, graphs_valid, clss_valid, ...
-    graphs_test, clss_test] = load_gw(folder, subfolder)
-
-fold = '/Data/Word_Graphs/01_Skew' ;
-
-[fns_train,clss_train] = read_gw_txt(fullfile(folder, 'Set','Train.txt')) ;
-[fns_valid,clss_valid] = read_gw_txt(fullfile(folder, 'Set','Valid.txt')) ;
-[fns_test,clss_test] = read_gw_txt(fullfile(folder, 'Set', 'Test.txt')) ;
-
-ntrain = length(fns_train) ; 
-nvalid = length(fns_valid) ; 
-ntest = length(fns_test) ; 
-
-for i = 1:ntrain
-    [graphs_train(i).v, graphs_train(i).nl, graphs_train(i).e,...
-        graphs_train(i).el] = read_gw_gxl(fullfile(folder, fold,...
-        subfolder, fns_train{i})) ;
-end;
-
-for i = 1:nvalid
-    [graphs_valid(i).v, graphs_valid(i).nl, graphs_valid(i).e,...
-        graphs_valid(i).el] = read_gw_gxl(fullfile(folder, fold,...
-        subfolder, fns_valid{i})) ;
-end;
-
-for i = 1:ntest
-    [graphs_test(i).v, graphs_test(i).nl, graphs_test(i).e,...
-        graphs_test(i).el] = read_gw_gxl(fullfile(folder, fold,...
-        subfolder, fns_test{i})) ;
-end;
-
-end
 
 %% Default values
 function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
