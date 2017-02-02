@@ -3,6 +3,9 @@ function [vertices,atrvertices,edges,atredges] = read_grec_gxl(filename)
 % read the file as string
 fs = fileread(filename);
 
+cntrs_atrvertices = {'circle', 'corner', 'endpoint', 'intersection'};
+cntrs_atredges = {'arc', 'arcarc', 'line', 'linearc'};
+
 % split them with delimeter '_' to get the different parameters
 % get the node ids and labels
 
@@ -31,6 +34,8 @@ for i = 1:nvertices
     atrvertices{i} = tokens{i}{4};
 end;
 
+[~, atrvertices] = ismember(atrvertices, cntrs_atrvertices);
+
 % get the source and target of edges and labels
 tokens = regexp(fs,edge_expr,'tokens');
 
@@ -44,10 +49,12 @@ atredges = cell(nedges,1);
 for i = 1:nedges
     edges(i,:) = [str2double(tokens{i}(1)),str2double(tokens{i}(2))] + 1;    
     if(strcmp(tokens{i}(6),'line'))
-        atredges{i} = [str2double(tokens{i}(3)),tokens{i}(6),str2double(tokens{i}(7)),tokens{i}(4),str2double(tokens{i}(5))];
+        atredges(i) = tokens{i}(6) ;
     else
-        atredges{i} = [str2double(tokens{i}(3)),tokens{i}(4),str2double(tokens{i}(5)),tokens{i}(6),str2double(tokens{i}(7))];
+        atredges(i) = tokens{i}(4) ;
     end;
 end;
+
+[~, atredges] = ismember(atredges, cntrs_atredges);
 
 end
