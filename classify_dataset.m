@@ -72,7 +72,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
         fprintf('Loading Dataset = %s\n', dataset_name) ;
     end
     [ graphs , clss ] =  load_database( params.p_data , dataset_name ) ;
-            
+
     %% Database information
     ngraphs = size(graphs,2);
     classes = unique(clss);
@@ -229,7 +229,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
     clear global_var;
     
     % Save results
-    fileID = fopen([params.out dataset_name , '.txt'],'a') ;
+    fileID = fopen([params.out dataset_name '_' node_label '.txt'],'a') ;
     fprintf(fileID,params.headerSpec, dataset_name, ngraphs, nclasses, nits) ;
     fprintf(fileID,params.sgeSpec, epsi , del) ;
     fprintf(fileID,params.pyrSpec, pyr_levels , pyr_reduction , edge_thresh , func2str(clustering_func)) ;
@@ -298,10 +298,10 @@ function [ graphs , clss ] = load_database( p_data , dataset_name )
             graphs = NCI109;
         case 'GREC'
             [ graphs_train, clss_train, graphs_valid, clss_valid,...
-                graphs_test, clss_test] = load_grec(folder);
+                graphs_test, clss_test] = load_grec([ p_data filesep 'data']);
         case 'GWHistoGraph'
             [ graphs_train, clss_train, graphs_valid, clss_valid,...
-                graphs_test, clss_test] = load_gw(folder, subfolder);            
+                graphs_test, clss_test] = load_gw(p_data, subfolder);            
         otherwise
             error('pyramidalSGE:incorrectDataset',...
                 'Error. \nDatabase %s not accepted.', dataset_name)

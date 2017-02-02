@@ -69,15 +69,15 @@ function global_var = labelled_graphlet_embedding( graph , graph_id , M , global
     hash_codes(idxge5) = betweenness_centralities;
 
     % calculate node signatures with the help of classes of the vertices
-    node_sign = cellfun(@(x) sort(graph.nl(x))',graphlets,'UniformOutput',false);
+    node_sign = cellfun(@(x) sort(graph.nl.values(x))',graphlets,'UniformOutput',false);
 
     % calculate edge signatures with the help of classes of the vertices
-    edges_graphlets = cellfun(@(x) [x(1:2:end)' x(2:2:end)'],graphlets,'UniformOutput',false);
-    [~,idx_edges] = cellfun(@(x) ismember(x,edges,'rows'), edges_graphlets, 'UniformOutput', false);
-    edge_sign = cellfun(@(x) graph.el(x)', idx_edges, 'UniformOutput', false);
+%     edges_graphlets = cellfun(@(x) [x(1:2:end)' x(2:2:end)'],graphlets,'UniformOutput',false);
+%     [~,idx_edges] = cellfun(@(x) ismember(x,edges,'rows'), edges_graphlets, 'UniformOutput', false);
+%     edge_sign = cellfun(@(x) graph.el.values(x)', idx_edges, 'UniformOutput', false);
 
     for j = 1:size(hash_codes,1)
-        hash_codes{j} = [node_sign{j},edge_sign{j},hash_codes{j},zeros(1,2*sizes_graphlets(j)-size(hash_codes{j},2))];
+        hash_codes{j} = [node_sign{j},hash_codes{j},zeros(1,2*sizes_graphlets(j)-size(hash_codes{j},2))];
     end;
 
     clear idxle4 idxle5 sorted_degrees_nodes betweenness_centralities;
