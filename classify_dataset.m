@@ -63,7 +63,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
     clear user_path folders_paths ;
     
     %% Default values
-    [epsi, del, pyr_levels, pyr_reduction, edge_thresh, clustering_func, MAX2, nits, VERBOSE]...
+    [epsi, del, pyr_levels, pyr_reduction, edge_thresh, clustering_func, MAX2, node_label, nits, VERBOSE]...
         = input_parser( varargin ) ;
     rng(0);
         
@@ -111,7 +111,7 @@ function [  ] = classify_dataset( dataset_name, varargin )
         % Embedding
         for j = 1:pyr_levels
             if any(pyr_graph{j}.am(:))
-                [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) ) ;
+                [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , node_label ) ;
             end
         end ;
         
@@ -372,7 +372,7 @@ end
 
 %% Default values
 function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
-    max2, nits, VERBOSE] = input_parser( input )
+    max2, node_label, nits, VERBOSE] = input_parser( input )
     VERBOSE = 0 ;
     eps = 0.1 ;
     del = 0.1 ;
@@ -380,6 +380,9 @@ function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
     pyr_reduction = 2 ;
     edge_tresh = 0 ;
     clustering_func = @girvan_newman ;
+    
+    node_label = 'unlabel' ;
+    
     nits = 10 ;
     
     % Parse optional input parameters
@@ -412,6 +415,9 @@ function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
         case 'max2'
             v = v+1;
             max2 = input{v};
+        case 'label'
+            v = v+1;
+            node_label = input{v};
         case 'nits'
             v = v+1;
             nits = input{v};
