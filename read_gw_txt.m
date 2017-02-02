@@ -5,6 +5,7 @@ S = textscan(fp,'%s %s') ;
 fclose(fp) ;
 
 file_names = S{2} ;
+file_names = cellfun(@(x) [x, '.gxl'], file_names, 'UniformOutput', false);
 classes = S{1} ;
 
 end
