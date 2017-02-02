@@ -150,7 +150,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     end ;
     
     maccs = zeros(size(combinations,1));
-    mstds = zeros(size(combinations,1));
+    
     for c = 1:size(combinations,1)
         
         comb = combinations(c,:);
@@ -176,47 +176,41 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
 
         %% Evaluate
         % Evaluate nits times to get the accuracy mean and standard deviation
-        accs = zeros(nits,1);
-        for it = 1:nits
+        train_classes = clss(1:ntrain);
+        test_classes = clss(ntrain+(1:ntest));
 
 
-            train_classes = clss(1:ntrain);
-            test_classes = clss(ntrain+(1:ntest));
+        % Training and testing individual kernels
 
+        K_train = [(1:ntrain)' KM_train];
+        K_test = [(1:ntest)' KM_test];
 
-            % Training and testing individual kernels
+        cs = 5:5:100;
+        best_cv = 0;
 
-            K_train = [(1:ntrain)' KM_train];
-            K_test = [(1:ntest)' KM_test];
+        for j = 1:length(cs)
 
-            cs = 5:5:100;
-            best_cv = 0;
-
-            for j = 1:length(cs)
-
-                options = sprintf('-s 0 -t 4 -v %d -c %f -b 1 -g 0.07 -h 0 -q',...
-                        nits,cs(j));
-                model_libsvm = svmtrain(train_classes,K_train,options);
-
-                if(model_libsvm>best_cv)
-                    best_cv = model_libsvm;
-                    best_c = cs(j);
-                end;
-
-            end;
-
-            options = sprintf('-s 0 -t 4 -c %f -b 1 -g 0.07 -h 0 -q',...
-                best_c);
-
+            options = sprintf('-s 0 -t 4 -v %d -c %f -b 1 -g 0.07 -h 0 -q',...
+                    nits,cs(j));
             model_libsvm = svmtrain(train_classes,K_train,options);
 
-            [~,acc,~] = svmpredict(test_classes,K_test,model_libsvm,'-b 1');
-            accs(it) = acc(1);
-        end ;
+            if(model_libsvm>best_cv)
+                best_cv = model_libsvm;
+                best_c = cs(j);
+            end;
 
-        % Mean and standard deviation
-        maccs(c) = mean(accs);
-        mstds(c) = std(accs)./sqrt(nits);
+        end;
+
+        options = sprintf('-s 0 -t 4 -c %f -b 1 -g 0.07 -h 0 -q',...
+            best_c);
+
+        model_libsvm = svmtrain(train_classes,K_train,options);
+
+        [~,acc,~] = svmpredict(test_classes,K_test,model_libsvm,'-b 1');
+
+        % Mean
+        maccs(c) = acc(1);
+        
     end
     clear global_var;
     
@@ -236,9 +230,9 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
             	fprintf('%d\t', combinations(i,j)+2) ;
             end ;
         end ;
-        fprintf(fileID, '%.2f \\pm %.2f \n', maccs(i),mstds(i));
+        fprintf(fileID, '%.2f\n', maccs(i));
         if VERBOSE
-            fprintf('%.2f \\pm %.2f \n', maccs(i),mstds(i));
+            fprintf('%.2f\n', maccs(i));
         end ;
     end;
     fprintf(fileID,params.sepSpec) ;
