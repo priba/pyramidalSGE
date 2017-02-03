@@ -1,8 +1,6 @@
-function [ combs ] = allcomb( v1 , v2 )
+function [ combs ] = allcomb( vectors)
 %ALLCOMB Summary of this function goes here
 %   http://stackoverflow.com/questions/21895335/generate-a-matrix-containing-all-combinations-of-elements-taken-from-n-vectors
-
-    vectors = { v1, v2 }; %// input data: cell array of vectors
 
     n = numel(vectors); %// number of vectors
     combs = cell(1,n); %// pre-define to generate comma-separated list
