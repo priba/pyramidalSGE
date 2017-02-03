@@ -23,6 +23,25 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         params.folders = { 'clustering' } ;
         
         user_path = '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools' ;
+        
+    elseif ismember(lower(cellstr(name)), {'cluster1.cvc.uab.es'} )
+        
+        % Dataset path
+        params.p_data = '/home/dag/adutta/Datasets' ;
+
+        % External libreries (considering them to be on the userpath folder
+        params.libraries_sub = {'matlab_bgl', 'libsvm/matlab',...
+            'random_graphlet1'} ;
+        
+        % External libreries (considering them to be on the userpath
+        % folder) No subfolders will be added
+        params.libraries = { 'vlfeat/toolbox/vl_setup.m' } ;
+        
+        % Project folders
+        params.folders = { 'clustering' } ;
+        
+        user_path = '/home/dag/adutta/AdditionalTools' ;
+        
     else
         % Dataset path
         params.p_data = [ pwd filesep 'dataset' filesep ] ;
