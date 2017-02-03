@@ -17,7 +17,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         
         % External libreries (considering them to be on the userpath
         % folder) No subfolders will be added
-        params.libraries = { 'vlfeat' } ;
+        params.libraries = { 'vlfeat/toolbox/vl_setup.m' } ;
         
         % Project folders
         params.folders = { 'clustering' } ;
@@ -70,7 +70,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     addpath( [folders_paths{:} ])
     
     folders_paths = cellfun(@(x) strcat(user_path, filesep,x),params.libraries, 'UniformOutput', false ) ;
-    addpath( [folders_paths{:} ])
+    run( [folders_paths{:} ]) ;
 
     clear user_path folders_paths ;
     

@@ -48,14 +48,15 @@ function [eps, del, pyr_levels, pyr_reduction, edge_tresh, clustering_func,...
         case 'label'
             v = v+1;
             node_label = input{v};
-        case 'nits'
-            v = v+1;
-            nits = input{v};
-            otherwise
-            error('pyramidalSGE:inputParser', 'Unsupported parameter: %s',input{v});
         case 'task_id'
             v = v+1;
             task_id = input{v};
+        case 'nits'
+            v = v+1;
+            nits = input{v};
+        otherwise
+            error('pyramidalSGE:inputParser', 'Unsupported parameter: %s',input{v});
+        
         end
         v = v+1;
     end
