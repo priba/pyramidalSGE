@@ -1,6 +1,6 @@
 %% Parameters to test. Each row is an experiment
-clc; clear all;
 % Embedding
+function run_params = experiments()
 eps_i = [ 0.1 , 0.05 ] ;
 del_i = [ 0.1 , 0.05 ] ;
 max2 = [7, 5, 5];
