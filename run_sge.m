@@ -19,10 +19,10 @@ del_i = [ 0.1 , 0.05 ] ;
 max2 = [7, 5, 5];
 node_label = 'label';
 % Pyramid
-pyr_levels = [ 2 , 1 , 2  ] ;
+pyr_levels = [ 1 , 2  ] ;
 pyr_reduction = 2 ;
 edge_tresh = 0 ;
-clustering_func = @girvan_newman ;
+clustering_func = @grPartition; %  girvan_newman ;
 
 % Standard error
 nits = 10 ;

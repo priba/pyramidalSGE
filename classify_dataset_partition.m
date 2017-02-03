@@ -12,10 +12,14 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         params.p_data = '/home/adutta/Workspace/Datasets/STDGraphs' ;
 
         % External libreries (considering them to be on the userpath folder
-        params.libraries = {'matlab_bgl', 'libsvm/matlab', 'vlfeat',...
+        params.libraries_sub = {'matlab_bgl', 'libsvm/matlab',...
             'random_graphlet1'} ;
-
-             % Project folders
+        
+        % External libreries (considering them to be on the userpath
+        % folder) No subfolders will be added
+        params.libraries = { 'vlfeat' } ;
+        
+        % Project folders
         params.folders = { 'clustering' } ;
         
         user_path = '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools' ;
@@ -23,8 +27,13 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         % Dataset path
         params.p_data = [ pwd filesep 'dataset' filesep ] ;
 
-        % External libreries (considering them to be on the userpath folder
-        params.libraries = { 'matlab_bgl', 'libsvm/matlab', 'vlfeat' } ;
+        % External libreries (considering them to be on the userpath
+        % folder) All the subfolders will be added
+        params.libraries_sub = { 'matlab_bgl', 'libsvm/matlab'};
+        
+        % External libreries (considering them to be on the userpath
+        % folder) No subfolders will be added
+        params.libraries = { 'vlfeat' } ;
 
         % Project folders
         params.folders = { 'clustering', 'random_graphlet1' } ;
@@ -56,8 +65,11 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     user_path = strrep(user_path,';',''); % Windows
     user_path = strrep(user_path,':',''); % Linux
     
-    folders_paths = cellfun(@(x) strcat(user_path, filesep,x),params.libraries, 'UniformOutput', false ) ;
+    folders_paths = cellfun(@(x) strcat(user_path, filesep,x),params.libraries_sub, 'UniformOutput', false ) ;
     folders_paths = cellfun(@genpath,folders_paths, 'UniformOutput', false ) ;
+    addpath( [folders_paths{:} ])
+    
+    folders_paths = cellfun(@(x) strcat(user_path, filesep,x),params.libraries, 'UniformOutput', false ) ;
     addpath( [folders_paths{:} ])
 
     clear user_path folders_paths ;
@@ -247,10 +259,14 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     user_path = strrep(userpath,';',''); % Windows
     user_path = strrep(user_path,':',''); % Linux
     
-    folders_paths = cellfun(@(x) strcat(user_path, filesep,x),params.libraries, 'UniformOutput', false ) ;
+
+    folders_paths = cellfun(@(x) strcat(user_path, filesep,x),params.libraries_sub, 'UniformOutput', false ) ;
     folders_paths = cellfun(@genpath,folders_paths, 'UniformOutput', false ) ;
     rmpath( [folders_paths{:} ])
-
+    
+    folders_paths = cellfun(@(x) strcat(user_path, filesep,x),params.libraries, 'UniformOutput', false ) ;
+    rmpath( [folders_paths{:} ])
+    
     clear user_path folders_paths ;
     
 end
@@ -264,7 +280,7 @@ function [ graphs_train, clss_train, graphs_test, clss_test] = ...
                 graphs_test, clss_test] = load_grec([ p_data filesep dataset_name filesep 'data']);
         case 'GWHistoGraph'
             [ graphs_train, clss_train, graphs_valid, clss_valid,...
-                graphs_test, clss_test] = load_gw(p_data, subfolder);            
+                graphs_test, clss_test] = load_gw(p_data);            
         otherwise
             error('pyramidalSGE:incorrectDataset',...
                 'Error. \nDatabase %s not accepted.', dataset_name)
