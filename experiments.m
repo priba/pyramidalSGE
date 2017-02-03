@@ -21,7 +21,7 @@ emb_comb = allcomb( { eps_i, del_i, node_label_id } );
 % Pyramid
 pyr_comb = allcomb( { pyr_levels, pyr_reduction , edge_tresh , clustering_func_id} );
 pyr_comb(pyr_comb(:,1) == 1,:) = [];
-pyr_comb = [ 1 , zeros(1,size(pyr_comb,2)-2), 1 ; pyr_comb];
+pyr_comb = [ 1 , 1 , zeros(1,size(pyr_comb,2)-3), 1 ; pyr_comb];
 
 ind_comb = allcomb({1:size(emb_comb,1) , 1:size(pyr_comb,1)});
 
