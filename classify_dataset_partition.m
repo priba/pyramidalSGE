@@ -58,7 +58,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         params.folders = { 'clustering' } ;
         
         user_path = '/home/dag/adutta/AdditionalTools' ;
-        paths1 = '/home/dag/adutta/pyramidalSGE'
+        paths1 = '/home/dag/adutta/pyramidalSGE' ;
     end ;
     
     clear name;
