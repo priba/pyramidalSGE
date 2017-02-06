@@ -1,0 +1,3 @@
+Not considering levels for the pyramid creation.
+MUTAG: unlabelled, labelled
+GREC: unlabelled, labelled (node), labelled (node & edge)

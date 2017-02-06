@@ -23,7 +23,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         params.folders = { 'clustering' } ;
         
         user_path = '/home/adutta/Dropbox/Personal/Workspace/AdditionalTools' ;
-        
+        paths1 = pwd;
     elseif ismember(upper(cellstr(name)), {'CVC175'} )
         
         % Dataset path
@@ -40,11 +40,11 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         % Project folders
         params.folders = { 'clustering', 'random_graphlet1' } ;
         user_path = userpath;
-        
+        paths1 = pwd;
     else
         
         % Dataset path
-        params.p_data = '/home/dag/adutta/Datasets' ;
+        params.p_data = '/home/dag/adutta/Datasets/Graphs' ;
 
         % External libreries (considering them to be on the userpath folder
         params.libraries_sub = {'matlab_bgl', 'libsvm/matlab',...
@@ -58,7 +58,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         params.folders = { 'clustering' } ;
         
         user_path = '/home/dag/adutta/AdditionalTools' ;
-        
+        paths1 = '/home/dag/adutta/pyramidalSGE'
     end ;
     
     clear name;
@@ -79,10 +79,10 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     params.sepSpec = '----------------------------------------------------\n';
 
     %% Addpaths
-    folders_paths = cellfun(@(x) strcat(pwd, filesep,x),params.folders, 'UniformOutput', false ) ;
+    folders_paths = cellfun(@(x) strcat(paths1, filesep,x),params.folders, 'UniformOutput', false ) ;
     folders_paths = cellfun(@genpath,folders_paths, 'UniformOutput', false ) ;
     addpath([folders_paths{:} ])
-    
+
     user_path = strrep(user_path,';',''); % Windows
     user_path = strrep(user_path,':',''); % Linux
     

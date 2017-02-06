@@ -11,7 +11,7 @@ function [G1] = pyramid_construction(G , cluster, delta)
         idx_i = classes(i) == cluster ;
         
         % Discrete values
-        G1.nl.values(i) = round( mean(G.nl.values(idx_i,:),1) );
+%        G1.nl.values(i) = round( mean(G.nl.values(idx_i,:),1) );        
         for j = i+1:length(classes)
             idx_j = classes(j) == cluster ;
             connections = G.am(idx_i, idx_j) ;
