@@ -76,8 +76,8 @@ function global_var = labelled_graphlet_embedding( graph , graph_id , M , global
         edge_sign = cell(size(hash_codes,1),1);
     else
         edges_graphlets = cellfun(@(x) [x(1:2:end)' x(2:2:end)'],graphlets,'UniformOutput',false);	
-        [~,idx_edges] = cellfun(@(x) ismember(x,graph.e,'rows'), edges_graphlets, 'UniformOutput', false);
-        edge_sign = cellfun(@(x) graph.el.values(x)', idx_edges, 'UniformOutput', false);
+        [~,idx_edges] = cellfun(@(x) ismember(x, L, 'rows'), edges_graphlets, 'UniformOutput', false);
+        edge_sign = cellfun(@(x) graph.el.values(x, 1)', idx_edges, 'UniformOutput', false);
     end;
 
     for j = 1:size(hash_codes,1)
