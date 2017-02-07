@@ -198,7 +198,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         end
         
         % Normalize hist
-        comb_hist = comb_hist./repmat( sum(comb_hist,2)+eps ,1, size(comb_hist,2));
+        comb_hist = bsxfun(@times, comb_hist, 1./(sum(comb_hist,2)+eps));
         
         X_train = comb_hist(1:ntrain,:);
         X_test = comb_hist(ntrain+(1:ntest),:);

@@ -21,4 +21,6 @@ function [G1] = pyramid_construction(G , cluster, delta)
             end ;
         end ;
     end ;
+    G1.e = find(G1.am) ;
+    G1.el.values = [] ;
 end
