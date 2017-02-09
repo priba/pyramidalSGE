@@ -72,7 +72,7 @@ function global_var = labelled_graphlet_embedding( graph , graph_id , M , global
     node_sign = cellfun(@(x) sort(graph.nl.values(x))',graphlets,'UniformOutput',false);
 
     % calculate edge signatures with the help of classes of the vertices
-    if isempty(graph.el.values)
+    if ~isfield('el',graph) || isempty(graph.el.values)
         edge_sign = cell(size(hash_codes,1),1);
     else
         edges_graphlets = cellfun(@(x) [x(1:2:end)' x(2:2:end)'],graphlets,'UniformOutput',false);	

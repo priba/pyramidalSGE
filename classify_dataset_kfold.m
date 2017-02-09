@@ -36,7 +36,7 @@ function [  ] = classify_dataset_kfold( dataset_name, varargin )
         
         % External libreries (considering them to be on the userpath
         % folder) No subfolders will be added
-        params.libraries = { 'vlfeat' } ;
+        params.libraries = { 'vlfeat/toolbox/vl_setup.m' } ;
 
         % Project folders
         params.folders = { 'clustering', 'random_graphlet1' } ;
