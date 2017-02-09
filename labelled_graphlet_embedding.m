@@ -31,11 +31,11 @@ function global_var = labelled_graphlet_embedding( graph , graph_id , M , global
 %         clear weights_node_isz;
 %     end;
 
-    idx = sizes_graphlets <= 2 ; 
-    graphlets(idx) = [];
-    sizes_graphlets(idx) = [];
-    list_vertices_graphlets(idx) = [];
-    indices_vertices_graphlets(idx) = [];
+%     idx = sizes_graphlets <= 2 ; 
+%     graphlets(idx) = [];
+%     sizes_graphlets(idx) = [];
+%     list_vertices_graphlets(idx) = [];
+%     indices_vertices_graphlets(idx) = [];
 
     idxle4 = sizes_graphlets<=4;
 
@@ -72,7 +72,7 @@ function global_var = labelled_graphlet_embedding( graph , graph_id , M , global
     node_sign = cellfun(@(x) sort(graph.nl.values(x))',graphlets,'UniformOutput',false);
 
     % calculate edge signatures with the help of classes of the vertices
-    if ~isfield('el',graph) || isempty(graph.el.values)
+    if ~isfield(graph,'el') || ~isfield(graph.el,'values') || isempty(graph.el.values)
         edge_sign = cell(size(hash_codes,1),1);
     else
         edges_graphlets = cellfun(@(x) [x(1:2:end)' x(2:2:end)'],graphlets,'UniformOutput',false);	
@@ -86,7 +86,7 @@ function global_var = labelled_graphlet_embedding( graph , graph_id , M , global
 
     clear idxle4 idxle5 sorted_degrees_nodes betweenness_centralities;
 
-    for j = 3:MAX2
+    for j = 1:MAX2
         idxj = (sizes_graphlets == j);
 
         if(~nnz(idxj))
@@ -94,13 +94,13 @@ function global_var = labelled_graphlet_embedding( graph , graph_id , M , global
         end;
 
         hash_codes_j = cat(1,hash_codes{idxj});
-        global_var.hash_codes_uniq{j-2} = unique([global_var.hash_codes_uniq{j-2};hash_codes_j],'stable','rows');
-        [~,idx] = ismember(hash_codes_j,global_var.hash_codes_uniq{j-2},'rows');
+        global_var.hash_codes_uniq{j} = unique([global_var.hash_codes_uniq{j};hash_codes_j],'stable','rows');
+        [~,idx] = ismember(hash_codes_j,global_var.hash_codes_uniq{j},'rows');
 
         clear hash_codes_j;
 
-        global_var.idx_image{j-2} = [global_var.idx_image{j-2};graph_id*ones(size(idx))];
-        global_var.idx_bin{j-2} = [global_var.idx_bin{j-2};idx];
+        global_var.idx_image{j} = [global_var.idx_image{j};graph_id*ones(size(idx))];
+        global_var.idx_bin{j} = [global_var.idx_bin{j};idx];
 
         clear idxj idx;
     end;

@@ -274,15 +274,19 @@ function [  ] = classify_dataset_kfold( dataset_name, varargin )
     fprintf(fileID,params.headerSpec, dataset_name, ngraphs, nclasses, nits) ;
     fprintf(fileID,params.sgeSpec, epsi , del) ;
     fprintf(fileID,params.pyrSpec, pyr_levels , pyr_reduction , edge_thresh , func2str(clustering_func)) ;
+    shift = 0;
+    if strcmpi(node_label, 'unlabel')
+        shift = 2;
+    end
     for i = 1:size(combinations,1)
         fprintf(fileID, 't = ');
         if VERBOSE
             fprintf('t = ');
         end ;
         for j = 1:size(combinations,2)
-            fprintf(fileID, '%d\t', combinations(i,j)+2) ;
+            fprintf(fileID, '%d\t', combinations(i,j)+shift) ;
             if VERBOSE
-            	fprintf('%d\t', combinations(i,j)+2) ;
+            	fprintf('%d\t', combinations(i,j)+shift) ;
             end ;
         end ;
         fprintf(fileID, '%.2f \\pm %.2f \n', maccs(i),mstds(i));

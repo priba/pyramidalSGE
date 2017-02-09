@@ -124,7 +124,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
   
     % Initialize storage
     for i = 1:pyr_levels
-        M{i} = uint32(ceil(2*(params.T(1:MAX2(i))*log(2)+log(1/del))/epsi^2));
+        M{i} = uint32(ceil(2*(params.T(1:MAX2(i))*log(2)+log(1/del))/epsi^2)); 
         global_var(i).hash_codes_uniq = cell(MAX2(i)-2,1);
         global_var(i).idx_image = cell(MAX2(i)-2,1);
         global_var(i).idx_bin = cell(MAX2(i)-2,1);
@@ -256,25 +256,29 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     fprintf(fileID,params.headerSpec, dataset_name, ngraphs, nclasses, nits) ;
     fprintf(fileID,params.sgeSpec, epsi , del) ;
     fprintf(fileID,params.pyrSpec, pyr_levels , pyr_reduction , edge_thresh , func2str(clustering_func)) ;
+
+    shift = 0;
+    if strcmpi(node_label, 'unlabel')
+        shift = 2;
+    end
     for i = 1:size(combinations,1)
         fprintf(fileID, 't = ');
         if VERBOSE
             fprintf('t = ');
         end ;
         for j = 1:size(combinations,2)
-            fprintf(fileID, '%d\t', combinations(i,j)+2) ;
+            fprintf(fileID, '%d\t', combinations(i,j)+shift) ;
             if VERBOSE
-            	fprintf('%d\t', combinations(i,j)+2) ;
+            	fprintf('%d\t', combinations(i,j)+shift) ;
             end ;
         end ;
-        fprintf(fileID, '%.2f\n', maccs(i));
+        fprintf(fileID, '%.2f \n', maccs(i));
         if VERBOSE
-            fprintf('%.2f\n', maccs(i));
+            fprintf('%.2f \n', maccs(i));
         end ;
     end;
     fprintf(fileID,params.sepSpec) ;
     fclose(fileID);
-    
     
     %% Rmpaths
     folders_paths = cellfun(@(x) strcat(pwd, filesep,x),params.folders, 'UniformOutput', false ) ;
