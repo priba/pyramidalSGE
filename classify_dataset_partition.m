@@ -179,7 +179,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     % All possible combinations
     combinations = (1:MAX2(1)-2)';
     for j = 2:pyr_levels
-        combinations = allcomb( { combinations, 1:MAX2(j)-2 } ) ;
+        combinations = allcomb( { combinations, (1:MAX2(j)-2)' } ) ;
     end ;
     
     maccs = zeros(size(combinations,1));
@@ -187,9 +187,6 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     for c = 1:size(combinations,1)
         
         comb = combinations(c,:);
-        
-        KM_train = zeros(ntrain,ntrain);
-        KM_test = zeros(ntest,ntrain);
 
         % Concat histogram
         comb_hist = [];
@@ -203,8 +200,8 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         X_train = comb_hist(1:ntrain,:);
         X_test = comb_hist(ntrain+(1:ntest),:);
 
-        KM_train(:,:) = vl_alldist2(X_train',X_train','KL1');
-        KM_test(:,:) = vl_alldist2(X_test',X_train','KL1');
+        KM_train = vl_alldist2(X_train',X_train','KL1');
+        KM_test = vl_alldist2(X_test',X_train','KL1');
 
 
         %% Evaluate
