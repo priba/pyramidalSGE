@@ -177,22 +177,19 @@ function [  ] = classify_dataset_kfold( dataset_name, varargin )
     % All possible combinations
     combinations = (1:MAX2(1)-2)';
     for j = 2:pyr_levels
-        combinations = allcomb( { combinations, 1:MAX2(j)-2 } ) ;
+        combinations = allcomb( { combinations, (1:MAX2(j)-2)' } ) ;
     end ;
     
-    maccs = zeros(size(combinations,1));
-    mstds = zeros(size(combinations,1));
+    maccs = zeros(size(combinations,1),1);
+    mstds = zeros(size(combinations,1),1);
     for c = 1:size(combinations,1)
         
         comb = combinations(c,:);
         
-        KM_train = zeros(ngraphs,ngraphs);
-        KM_test = zeros(ngraphs,ngraphs);
-
         % Concat histogram
         comb_hist = [];
         for i = 1:length(comb)
-            comb_hist = [comb_hist , histograms{i}{comb(i)} ];
+            comb_hist = [comb_hist , combine_graphlet_hist(histograms{i}, comb(i), 'not_combine') ];
         end
         
         % Normalize hist
@@ -201,8 +198,8 @@ function [  ] = classify_dataset_kfold( dataset_name, varargin )
         X_train = comb_hist;
         X_test = comb_hist;
 
-        KM_train(:,:) = vl_alldist2(X_train',X_train','KL1');
-        KM_test(:,:) = vl_alldist2(X_test',X_train','KL1');
+        KM_train = vl_alldist2(X_train',X_train','KL1');
+        KM_test = vl_alldist2(X_test',X_train','KL1');
 
 
         %% Evaluate

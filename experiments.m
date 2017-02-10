@@ -1,18 +1,18 @@
 %% Parameters to test. Each row is an experiment
 % Embedding
 function run_params = experiments()
-eps_i = [ 0.1 , 0.05 ] ;
-del_i = [ 0.1 , 0.05 ] ;
-max2 = [7, 5, 5];
+eps_i = [ 0.1 ; 0.05 ] ;
+del_i = [ 0.1 ; 0.05 ] ;
+max2 = [7; 5; 5];
 node_label = {'unlabel' , 'label'};
-node_label_id = 1:size(node_label,2);
+node_label_id = (1:size(node_label,2))';
 
 % Pyramid
-pyr_levels = [ 1 , 2  ] ;
-pyr_reduction = [ 1.5 , 2 ] ;
-edge_tresh = [ 0 , 0.25 ] ;
+pyr_levels = [ 1 ; 2  ] ;
+pyr_reduction = [ 1.5 ; 2 ] ;
+edge_tresh = [ 0 ; 0.25 ] ;
 clustering_func = {@girvan_newman , @grPartition };
-clustering_func_id = 1:size(clustering_func,2);
+clustering_func_id = (1:size(clustering_func,2))';
 
 % Embedding
 emb_comb = allcomb( { eps_i, del_i, node_label_id } );
@@ -23,7 +23,7 @@ pyr_comb = allcomb( { pyr_levels, pyr_reduction , edge_tresh , clustering_func_i
 pyr_comb(pyr_comb(:,1) == 1,:) = [];
 pyr_comb = [ 1 , 1 , zeros(1,size(pyr_comb,2)-3), 1 ; pyr_comb];
 
-ind_comb = allcomb({1:size(emb_comb,1) , 1:size(pyr_comb,1)});
+ind_comb = allcomb({(1:size(emb_comb,1))' , (1:size(pyr_comb,1))'});
 
 run_params = [ emb_comb(ind_comb(:,1),:), pyr_comb(ind_comb(:,2),:) ] ;
 run_params = num2cell( run_params ) ; 

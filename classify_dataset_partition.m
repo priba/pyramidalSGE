@@ -168,7 +168,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     
     %% Compute histograms and kernels
     histograms = cell(pyr_levels,1);
-
+combine
     for j = 1:pyr_levels
         histograms{j} = cell(1,MAX2(j)-2);
         for i = 1:MAX2(j)-2
@@ -182,7 +182,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         combinations = allcomb( { combinations, (1:MAX2(j)-2)' } ) ;
     end ;
     
-    maccs = zeros(size(combinations,1));
+    maccs = zeros(size(combinations,1),1);
     
     for c = 1:size(combinations,1)
         
@@ -191,7 +191,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         % Concat histogram
         comb_hist = [];
         for i = 1:length(comb)
-            comb_hist = [comb_hist , histograms{i}{comb(i)} ];
+            comb_hist = [comb_hist , combine_graphlet_hist(histograms{i}, comb(i), 'combine') ];
         end
         
         % Normalize hist
