@@ -1,4 +1,4 @@
-function [  ] = classify_dataset_partition( dataset_name, varargin )
+function [  ] = classify_dataset_partition( dataset_name, subset, varargin )
 %CLASSIFY_DATASET Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -105,7 +105,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
         fprintf('Loading Dataset = %s\n', dataset_name) ;
     end
     [ graphs_train, clss_train, graphs_test, clss_test] ...
-        =  load_database( params.p_data , dataset_name ) ;
+        =  load_database( params.p_data , dataset_name, subset ) ;
     
     graphs = [graphs_train , graphs_test];
     clss = [clss_train; clss_test];
@@ -248,7 +248,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     if task_id<0
         fileID = fopen([params.out dataset_name '_' node_label '.txt'],'a') ;
     else
-        fileID = fopen([params.out dataset_name '_' node_label '_' num2str(task_id) '.txt'],'a') ;
+        fileID = fopen([params.out dataset_name '_' subset '_' node_label '_' num2str(task_id) '.txt'],'a') ;
     end
     fprintf(fileID,params.headerSpec, dataset_name, ngraphs, nclasses, nits) ;
     fprintf(fileID,params.sgeSpec, epsi , del) ;
@@ -299,13 +299,12 @@ end
 
 %% Loads the database in the correct format
 function [ graphs_train, clss_train, graphs_test, clss_test] = ...
-    load_database( p_data , dataset_name )
+    load_database( p_data , dataset_name, subset )
     switch dataset_name
         case 'GREC'
             [ graphs_train, clss_train, graphs_valid, clss_valid,...
                 graphs_test, clss_test] = load_grec([ p_data filesep dataset_name filesep 'data']);
-        case 'GWHistoGraph'
-            subset = '01_Keypoint' ;
+        case 'GWHistoGraph'            
             [ graphs_train, clss_train, graphs_valid, clss_valid,...
                 graphs_test, clss_test] = load_gw([p_data filesep dataset_name], subset);
         otherwise

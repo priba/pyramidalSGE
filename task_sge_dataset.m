@@ -1,5 +1,5 @@
 %% Run classification script
-function [] = task_sge_dataset(task_id, dataset_name)
+function [] = task_sge_dataset(task_id, dataset_name, subset)
 
     clc;
 
@@ -26,7 +26,7 @@ function [] = task_sge_dataset(task_id, dataset_name)
 
 
     if ismember(lower(dataset_name), {'grec','gwhistograph'})
-        classify_dataset_partition(dataset_name, 'VERBOSE', VERBOSE, 'epsilon', eps, 'delta', del, ...
+        classify_dataset_partition(dataset_name, subset, 'VERBOSE', VERBOSE, 'epsilon', eps, 'delta', del, ...
             'pyr_levels', pyr_level,'pyr_reduction', pyr_reduction, 'edge_tresh', edge_tresh, ...
             'max2', max2(1:pyr_level), 'label', node_label, 'clustering_func' , clustering_func, 'task_id', task_id);
     else
