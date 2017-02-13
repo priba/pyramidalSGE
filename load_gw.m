@@ -19,7 +19,7 @@ function [ graphs_train, clss_train, graphs_valid, clss_valid, ...
     ntest = length(fns_test) ;
     
     v_all = [] ; % for accumulating the vertices
-    k = 20 ; % number of clusters for clustering the vertices
+    k = 15 ; % number of clusters for clustering the vertices
     
     for i = 1:ntrain
         [graphs_train(i).v, graphs_train(i).nl.values, graphs_train(i).e,...
