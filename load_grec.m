@@ -1,7 +1,6 @@
 function [ graphs_train, clss_train, graphs_valid, clss_valid,...
-    graphs_test, clss_test] = load_grec()
-
-    folder = '/home/adutta/Workspace/Datasets/IAMGraphs/GREC/data' ;
+    graphs_test, clss_test] = load_grec(folder)
+    
     %% Load GREC database
 
     [fns_train,clss_train] = read_grec_cxl(fullfile(folder,'train.cxl')) ;
@@ -51,21 +50,21 @@ function [ graphs_train, clss_train, graphs_valid, clss_valid,...
     end_idx = 0 ;
     
     for i = 1:ntrain
-        sz = size(graphs_train(i).nl.values, 1) ;
+        sz = size(graphs_train(i).v, 1) ;
         end_idx = end_idx + sz ;
         graphs_train(i).nl.values = cl(start_idx:end_idx, :) ;
         start_idx = start_idx + sz ;        
     end;
     
     for i = 1:nvalid
-        sz = size(graphs_valid(i).nl.values, 1) ;
+        sz = size(graphs_valid(i).v, 1) ;
         end_idx = end_idx + sz ;
         graphs_valid(i).nl.values = cl(start_idx:end_idx, :) ;
         start_idx = start_idx + sz ;
     end;
     
     for i = 1:ntest
-        sz = size(graphs_test(i).nl.values, 1) ;
+        sz = size(graphs_test(i).v, 1) ;
         end_idx = end_idx + sz ;
         graphs_test(i).nl.values = cl(start_idx:end_idx, :) ;
         start_idx = start_idx + sz ;
