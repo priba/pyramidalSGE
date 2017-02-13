@@ -7,6 +7,12 @@ function [ graphs_train, clss_train, graphs_valid, clss_valid, ...
     [fns_train,clss_train] = read_gw_txt(fullfile(folder, 'Set','Train.txt')) ;
     [fns_valid,clss_valid] = read_gw_txt(fullfile(folder, 'Set','Valid.txt')) ;
     [fns_test,clss_test] = read_gw_txt(fullfile(folder, 'Set', 'Test.txt')) ;
+    
+    clss_all = unique([clss_train; clss_valid; clss_test]) ;
+    
+    [~, clss_train] = ismember(clss_train, clss_all) ;
+    [~, clss_valid] = ismember(clss_valid, clss_all) ;
+    [~, clss_test] = ismember(clss_test, clss_all) ;
 
     ntrain = length(fns_train) ; 
     nvalid = length(fns_valid) ; 

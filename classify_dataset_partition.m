@@ -168,7 +168,7 @@ function [  ] = classify_dataset_partition( dataset_name, varargin )
     
     %% Compute histograms and kernels
     histograms = cell(pyr_levels,1);
-combine
+
     for j = 1:pyr_levels
         histograms{j} = cell(1,MAX2(j)-2);
         for i = 1:MAX2(j)-2
