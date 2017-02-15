@@ -5,7 +5,11 @@ function [ cluster ] = girvan_newman( A , lambda )
     if lambda > size(A,1) || lambda < 1
         error('Not a correct lambda size')
     end;
-
+    
+    % Make it undirected
+    A = (A + A')/2;
+    
+    % Make it sparse
     if ~issparse( A )
         A = sparse(A) ;
     end ;

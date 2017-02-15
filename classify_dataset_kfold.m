@@ -147,11 +147,14 @@ function [  ] = classify_dataset_kfold( dataset_name, varargin )
         % Embedding
         for j = 1:pyr_levels
             if any(pyr_graph{j}.am(:))
-                [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , node_label ) ;
-            end
+                if (j > 1)
+                    [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , 'unlabel') ;
+                else
+                    [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , node_label ) ;
+                end ;
+            end ;
         end ;
-        
-        
+                
         if VERBOSE
             toc
         end ;
@@ -271,19 +274,23 @@ function [  ] = classify_dataset_kfold( dataset_name, varargin )
     fprintf(fileID,params.headerSpec, dataset_name, ngraphs, nclasses, nits) ;
     fprintf(fileID,params.sgeSpec, epsi , del) ;
     fprintf(fileID,params.pyrSpec, pyr_levels , pyr_reduction , edge_thresh , func2str(clustering_func)) ;
-    shift = 0;
+    
     if strcmpi(node_label, 'unlabel')
-        shift = 2;
-    end
+        combinations = combinations + 2;
+    else
+        if size(combinations, 2) > 1
+            combinations(:, 2:end) = combinations(:, 2:end) + 2;
+        end ;
+    end ;
     for i = 1:size(combinations,1)
         fprintf(fileID, 't = ');
         if VERBOSE
             fprintf('t = ');
         end ;
         for j = 1:size(combinations,2)
-            fprintf(fileID, '%d\t', combinations(i,j)+shift) ;
+            fprintf(fileID, '%d\t', combinations(i,j)) ;
             if VERBOSE
-            	fprintf('%d\t', combinations(i,j)+shift) ;
+            	fprintf('%d\t', combinations(i,j)) ;
             end ;
         end ;
         fprintf(fileID, '%.2f \\pm %.2f \n', maccs(i),mstds(i));
