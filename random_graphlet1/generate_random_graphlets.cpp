@@ -48,14 +48,18 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 		mexErrMsgTxt("\nError: Too many output arguments.\n");
 		return;
 	}
-	if(mxGetM(LIST_EDGES_IN)<2)
+	if(mxGetM(LIST_EDGES_IN)<1)
 	{
-		mexErrMsgTxt("\nError: Check the dimensions of list of edges.\n");
+        char buffer [150];
+        sprintf (buffer, "\nError: Check the dimension M of list of edges.\nRecieved %lu instead of more than 1.\n", mxGetM(LIST_EDGES_IN));
+		mexErrMsgTxt(buffer);
 		return;
 	}
 	if(mxGetN(LIST_EDGES_IN)!=2)
 	{
-		mexErrMsgTxt("\nError: Check the dimensions of list of edges.\n");
+        char buffer [150];
+        sprintf (buffer, "\nError: Check the dimension N of list of edges.\nRecieved %lu instead of 2.\n", mxGetN(LIST_EDGES_IN));
+		mexErrMsgTxt(buffer);
 		return;
 	}
 

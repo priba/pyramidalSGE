@@ -149,12 +149,12 @@ function [  ] = classify_dataset_partition( dataset_name, subset, varargin )
         % Embedding
         for j = 1:pyr_levels
             if any(pyr_graph{j}.am(:))
-                [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , node_label ) ;
-%                 if (j > 1)
-%                     [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , 'unlabel') ;
-%                 else
-%                     [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , node_label ) ;
-%                 end;
+%                 [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , node_label ) ;
+                if (j > 1)
+                    [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , 'unlabel') ;
+                else
+                    [ global_var(j) ] = graphlet_embedding(pyr_graph{j} , i , M{j} , global_var(j), MAX2(j) , node_label ) ;
+                end;
             end
         end ;
         
