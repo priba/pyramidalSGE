@@ -60,7 +60,7 @@ function [  ] = classify_dataset_kfold( dataset_name, varargin )
         params.folders = { 'clustering' } ;
         
         user_path = '/home/dag/adutta/AdditionalTools' ;
-	paths1 = '/home/dag/adutta/pyramidalSGE'
+	paths1 = '/home/dag/adutta/pyramidalSGE';
         
     end ;
     
@@ -341,10 +341,18 @@ function [ graphs , clss ] = load_database( p_data , dataset_name )
             load(fullfile(p_data,'NCI1.mat'));
             clss = lnci1;
             graphs = NCI1;
+            for i = 1:length(graphs)
+                graphs_(i) = rmfield(graphs(i), 'el');
+            end;
+            graphs = graphs_;
         case 'NCI109'
             load(fullfile(p_data,'NCI109.mat'));
             clss = lnci109;
-            graphs = NCI109;      
+            graphs = NCI109;
+            for i = 1:length(graphs)
+                graphs_(i) = rmfield(graphs(i), 'el');
+            end;
+            graphs = graphs_;
         otherwise
             error('pyramidalSGE:incorrectDataset',...
                 'Error. \nDatabase %s not accepted.', dataset_name)
