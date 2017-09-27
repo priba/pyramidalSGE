@@ -18,7 +18,7 @@ max_len_graphlets = uint32(3);
 
 % Generate random graphs
 tic;
-graphlets = generate_random_hierarchical_graphlets(L,L_h,num_graphlets,max_len_graphlets);
+graphlets_original = generate_random_hierarchical_graphlets(L,L_h,num_graphlets,max_len_graphlets);
 toc;
 
 %% Hierarchical graph
@@ -37,5 +37,5 @@ L_h = [uint32(I12),uint32(J12)]; % Hierarchical edges
 
 % Generate random graphs
 tic;
-graphlets = generate_random_hierarchical_graphlets(L,L_h,num_graphlets,max_len_graphlets);
+graphlets_hierarchical = generate_random_hierarchical_graphlets(L,L_h,num_graphlets,max_len_graphlets);
 toc;

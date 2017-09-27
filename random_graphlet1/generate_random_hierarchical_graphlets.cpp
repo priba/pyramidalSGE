@@ -78,22 +78,19 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     }
     
 	mxArray *mxlist_edges_input = (mxArray *)LIST_EDGES_IN;
-    mxArray *mxlist_hierarchical_edges_input = (mxArray *)LIST_HIERARCHICAL_EDGES_IN;
+    
 	mxArray *mxnum_graphlets_input = (mxArray *)NUM_GRAPHLETS_IN;
 	mxArray *mxmax_size_input = (mxArray *)MAX_SIZE_IN;	
 
 	unsigned int *list_edges_input = (unsigned int *)mxGetData(mxlist_edges_input);
-    unsigned int *list_hierarchical_edges_input = (unsigned int *)mxGetData(mxlist_hierarchical_edges_input);
 	unsigned int *num_graphlets_input = (unsigned int *)mxGetData(mxnum_graphlets_input);
 	unsigned int *max_size_input = (unsigned int *)mxGetData(mxmax_size_input);
-
+    
 	mxArray *cell_matrix = mxCreateCellMatrix(*num_graphlets_input**max_size_input,1);
 
 	int num_edges = mxGetM(mxlist_edges_input);
-    int num_hierarchical_edges = mxGetM(mxlist_hierarchical_edges_input);
-    
-	// First copy the edges into a list and the nodes into a set
 
+    // First copy the edges into a list and the nodes into a set
 	std::list<EDGE> edges;
 	std::set<unsigned int> nodes;
 	for(int i = 0;i<num_edges;i++)
@@ -107,16 +104,26 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 		nodes.insert(list_edges_input[i+num_edges]);
 	}
     
-    // Copy the Hierarchical edges into a list and the nodes into a set
-
-	std::list<EDGE> hier_edges;
-	for(int i = 0;i<num_edges;i++)
-	{
-		EDGE edge;
-		edge.start = list_hierarchical_edges_input[i];
-		edge.end = list_hierarchical_edges_input[i+num_hierarchical_edges];
-		hier_edges.push_back(edge);
-	}	
+    
+    if(hierarchical_edges==1){
+        mxArray *mxlist_hierarchical_edges_input = (mxArray *)LIST_HIERARCHICAL_EDGES_IN;
+        unsigned int *list_hierarchical_edges_input = (unsigned int *)mxGetData(mxlist_hierarchical_edges_input);
+        int num_hierarchical_edges = mxGetM(mxlist_hierarchical_edges_input);
+        
+        // Copy the Hierarchical edges into a list and the nodes into a set
+        std::list<EDGE> hier_edges;
+        for(int i = 0;i<num_hierarchical_edges;i++)
+        {
+            EDGE edge;
+            edge.start = list_hierarchical_edges_input[i];
+            edge.end = list_hierarchical_edges_input[i+num_hierarchical_edges];
+            hier_edges.push_back(edge);
+        }
+    }
+    
+	
+    
+    	
 	
 	// Now create a node to edges indices, this is an array of sets. Each set is dedicated
 	// for a node and it contains the indices of the edges
